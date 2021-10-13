@@ -10,7 +10,7 @@
             },
             "windows": {
                 "command": "python -i \\\"${file}\\\""
-                },
+            },
             "linux": {
                 "command": "python -i \"${file}\""
             },
@@ -27,13 +27,16 @@
             },
             "windows": {
                 "command": "ocaml -init \\\"${file}\\\""
-                },
+            },
             "linux": {
                 "command": "ocaml -init \"${file}\""
             },
             "osx": {
                 "command": "ocaml -init \"${file}\""
-            }
+            },
+            "problemMatcher": [
+                "$ocamlc"
+            ]
         }
     ]
 }
