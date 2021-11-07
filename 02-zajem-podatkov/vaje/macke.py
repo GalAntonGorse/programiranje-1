@@ -1,5 +1,7 @@
 import csv
 import os
+import re
+import requests
 
 ###############################################################################
 # Najprej definirajmo nekaj pomožnih orodij za pridobivanje podatkov s spleta.
@@ -21,13 +23,18 @@ def download_url_to_string(url):
     """
     try:
         # del kode, ki morda sproži napako
-        page_content = 'TODO'
-    except 'TODO':
+        r = requests.get(url)
+    except requests.exceptions.ConnectionError as e:
         # koda, ki se izvede pri napaki
         # dovolj je če izpišemo opozorilo in prekinemo izvajanje funkcije
-        raise NotImplementedError()
+        print("Napaka {e} pri povezovanju do: {url}:\n{e}")
+        return None
+    if r.status_code == requests.codes.ok:
+        return r.text
+    else: 
+        raise requests.HTTPError(f"Ni ok: {r.status_code}")
     # nadaljujemo s kodo če ni prišlo do napake
-    raise NotImplementedError()
+    
 
 
 def save_string_to_file(text, directory, filename):
@@ -48,8 +55,9 @@ def save_string_to_file(text, directory, filename):
 def save_frontpage(page, directory, filename):
     """Funkcija shrani vsebino spletne strani na naslovu "page" v datoteko
     "directory"/"filename"."""
-    raise NotImplementedError()
-
+    r = download_url_to_string(page)
+    save_string_to_file(r, directory, filename)  
+    return None 
 
 ###############################################################################
 # Po pridobitvi podatkov jih želimo obdelati.
@@ -58,8 +66,9 @@ def save_frontpage(page, directory, filename):
 
 def read_file_to_string(directory, filename):
     """Funkcija vrne celotno vsebino datoteke "directory"/"filename" kot niz."""
-    raise NotImplementedError()
-
+    path = os.path.join(directory, filename)
+    with open(path, encoding='utf-8') as file_in:
+        file_in.read()
 
 # Definirajte funkcijo, ki sprejme niz, ki predstavlja vsebino spletne strani,
 # in ga razdeli na dele, kjer vsak del predstavlja en oglas. To storite s
@@ -70,7 +79,11 @@ def read_file_to_string(directory, filename):
 def page_to_ads(page_content):
     """Funkcija poišče posamezne oglase, ki se nahajajo v spletni strani in
     vrne seznam oglasov."""
-    raise NotImplementedError()
+    rx = re.compile(r'<li class="EntityList-item EntityList-item--'
+                    r'(.*?)</article>',
+                    re.DOTALL)
+    ads = rx.findall(page_content)
+    return ads
 
 
 # Definirajte funkcijo, ki sprejme niz, ki predstavlja oglas, in izlušči
