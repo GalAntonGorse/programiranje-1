@@ -4,7 +4,12 @@
 Namig: Definirajte pomožno funkcijo za obračanje seznamov.
 [*----------------------------------------------------------------------------*)
 
-let rec reverse = ()
+
+let reverse list =
+  let rec reverse_aux acc = function
+    | [] -> acc
+    | x :: xs -> reverse_aux (x :: acc) xs
+  in reverse_aux [] list
 
 (*----------------------------------------------------------------------------*]
  Funkcija [repeat x n] vrne seznam [n] ponovitev vrednosti [x]. Za neprimerne
@@ -16,7 +21,11 @@ let rec reverse = ()
  - : string list = []
 [*----------------------------------------------------------------------------*)
 
-let rec repeat = ()
+let repeat x n =
+  let rec repeat_aux aux x = function
+  | n when n <= 0 -> aux
+  | n -> repeat_aux (x :: aux) x (n - 1)
+in repeat_aux [] x n
 
 (*----------------------------------------------------------------------------*]
  Funkcija [range] sprejme število in vrne seznam vseh celih števil od 0 do
@@ -27,7 +36,11 @@ let rec repeat = ()
  - : int list = [0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10]
 [*----------------------------------------------------------------------------*)
 
-let rec range = ()
+let range n =
+  let rec range_aux aux = function
+  | n when n < 0 -> aux
+  | n -> range_aux (aux @ [n]) (n - 1)
+in range_aux [] n
 
 (*----------------------------------------------------------------------------*]
  Funkcija [map f list] sprejme seznam [list] oblike [x0; x1; x2; ...] in
@@ -39,7 +52,9 @@ let rec range = ()
  - : int list = [2; 3; 4; 5; 6]
 [*----------------------------------------------------------------------------*)
 
-let rec map = ()
+let rec map f = function
+  | [] -> []
+  | x :: xs -> f x :: (map f xs)
 
 (*----------------------------------------------------------------------------*]
  Funkcija [map_tlrec] je repno rekurzivna različica funkcije [map].
@@ -49,7 +64,11 @@ let rec map = ()
  - : int list = [2; 3; 4; 5; 6]
 [*----------------------------------------------------------------------------*)
 
-let rec map_tlrec = ()
+let map_tlrec f list =
+  let rec map_aux aux f = function
+  | [] -> reverse aux
+  | x :: xs -> map_aux (f x :: aux) f xs
+in map_aux [] f list
 
 (*----------------------------------------------------------------------------*]
  Funkcija [mapi] je ekvivalentna python kodi:
