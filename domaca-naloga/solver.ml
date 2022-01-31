@@ -16,7 +16,7 @@ let initialize_state (problem : Model.problem) : state =
 
 let validate_state (state : state) : response =
   let unsolved =
-    Array.exists (Array.exists Option.is_none) state.current_grid
+    Array.exists (Array.exists Option.is_none) state.current_grid (* pogleda, če je še kakšno nerešeno polje*)
   in
   if unsolved then Unsolved state
   else
