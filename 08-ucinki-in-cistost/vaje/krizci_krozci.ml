@@ -186,15 +186,15 @@ let place_token player grid (row_i, col_i) : state =
   | None when not (is_full_grid updated_grid) ->
       (* V tej potezi nismo dobili zmagovalca ampak igra se lahko nadaljuje.
       Vrnemo [OnTurn] s posodobljeno mrežo in nasprotnikom, ki je na potezi. *)
-      failwith "DOPOLNI ME"
+      OnTurn {player = other_player player; grid = updated_grid}
   | None (* grid is full *) ->
       (* Ni bilo zmagovalca, vendar so vsa polja polna. Vrnemo [GameOver] z
       novo mrežo in oznako za neodločen izid. *)
-      failwith "DOPOLNI ME"
-  | Some player ->
+      GameOver {result = Tie; final_grid = updated_grid}
+  | Some p ->
       (* Dobili smo zmagovalca, torej vrnemo [GameOver] z novo mrežo in
       zmagovalcem *)
-      failwith "DOPOLNI ME"
+      GameOver {result = Winner p; final_grid = updated_grid}
 
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
@@ -222,7 +222,9 @@ let place_token player grid (row_i, col_i) : state =
  mrežo ter trenutno situacijo (kdo je na potezi, kdo je zmagal).
 [*----------------------------------------------------------------------------*)
 
-let show_player player = failwith "DOPOLNI ME"
+let show_player = function
+| X -> "X"
+| O -> "O"
 
 let show_field = function
   | None -> " "
@@ -243,7 +245,10 @@ let show_state = function
   | OnTurn {player; grid} ->
       "Na potezi je: " ^ show_player player ^ "\n" ^ show_grid grid ^ "\n"
   | GameOver {result; final_grid} ->
-      let winner_message = "DOPOLNI ME" in
+      let winner_message = match result with
+      | Tie -> "Ni zmagovalca"
+      | Winner p -> "Zmagal je" ^ show_player p ^ "!" 
+    in
       winner_message ^ "\n" ^ show_grid final_grid ^ "\n"
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
@@ -258,7 +263,11 @@ let show_state = function
  (stolpec ali vrstico). Nato prebere izbiro, in jo poskusi pretvoriti v indeks.
  Če vnos ni primeren, proces ponovi.
 [*----------------------------------------------------------------------------*)
-let string_to_index = failwith "DOPOLNI ME"
+let string_to_index = function
+  | "0" -> Some Zero
+  | "1" -> Some One
+  | "2" -> Some Two
+  | _ -> None
 
 let rec choose kind =
   (* Sporočilo kaj želimo. *)
@@ -287,9 +296,20 @@ let rec choose kind =
      nespremenjeno. V obeh primerih ponovno požene zanko, da se igra nadaljuje.
 [*----------------------------------------------------------------------------*)
 
-let rec loop state = failwith "DOPOLNI ME"
+let rec loop state = 
+  print_string (show_state state);
+  match state with
+  | GameOver _ -> ()
+  | OnTurn {player; grid} ->
+    let row_i = choose "vrstico" in 
+    let col_i = choose "stolpec" in 
+    match get_field row_i col_i grid with
+    | None -> let updated_state = place_token player grid (row_i, col_i) in 
+    loop updated_state
+    | Some _ -> loop state
+  
 
 (*----------------------------------------------------------------------------*]
  Funkcija [play_game] požene svežo igro.
 [*----------------------------------------------------------------------------*)
-let rec play_game () = failwith "DOPOLNI ME"
+let rec play_game () = loop initial_state
